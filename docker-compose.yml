@@ -1,0 +1,77 @@
+################################################################################
+# SWA Docker Compose
+# Run the local development stack
+################################################################################
+
+version: "3"
+
+services:
+  influx:
+    image: influxdb:latest
+    environment:
+      - TZ=Europe/Zurich
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb:/var/lib/influxdb
+    env_file:
+      - .env
+    networks:
+      - swa-net
+    environment:
+      INFLUXDB_HTTP_FLUX_ENABLED: 'true'
+  chronograf:
+    image: chronograf:latest
+    environment:
+      - TZ=Europe/Bern
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./chronograf:/data/chronograf
+    env_file:
+      - .env
+    networks:
+      - swa-net
+    depends_on:
+      - influx
+  node-red:
+    image: fnyffene/swa-meshup:latest
+    build: 
+      context: ./meshup
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - TZ=Europe/Zurich
+    ports:
+      - "1880:1880"
+    networks:
+      - swa-net
+    volumes:
+      - ./meshup:/data
+    depends_on:
+      - influx
+  python:
+    image: python:latest
+    build: 
+      context: ./python
+      dockerfile: Dockerfile
+    environment:
+      - TZ=Europe/Zurich
+    ports:
+      - "8890:8890"
+    networks:
+      - swa-net
+    links:
+      - influx
+    volumes:
+      - ./python:/data
+    env_file:
+      - .env
+    depends_on:
+      - influx
+volumes:
+  influxdb:
+
+networks:
+  swa-net:
