@@ -1,8 +1,0 @@
-requests
-influxdb
-datetime
-scipy
-numpy
-matplotlib
-pandas
-python-dotenv

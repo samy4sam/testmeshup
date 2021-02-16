@@ -24,8 +24,8 @@ RUN set -ex && \
  RUN adduser -h /usr/src/node-red -D -H node-red -u 1000 
  RUN chown -R node-red:root /data && chmod -R g+rwX /data
  RUN chown -R node-red:root /usr/src/node-red && chmod -R g+rwX /usr/src/node-red
- #RUN chown -R node-red:node-red /data && \
- #    chown -R node-red:node-red /usr/src/node-red
+    # chown -R node-red:node-red /data && \
+    # chown -R node-red:node-red /usr/src/node-red
 
 # Set work directory
 WORKDIR /usr/src/node-red
@@ -39,7 +39,7 @@ FROM base AS build
 # Install Build tools
 RUN apk add --no-cache --virtual buildtools build-base linux-headers udev python && \
     npm install --unsafe-perm --no-update-notifier --no-fund --only=production && \
-    #/tmp/remove_native_gpio.sh && \
+    /tmp/remove_native_gpio.sh && \
     cp -R node_modules prod_node_modules
 
 #### Stage RELEASE #####################################################################################################
@@ -68,7 +68,7 @@ COPY --from=build /usr/src/node-red/prod_node_modules ./node_modules
 
 # Chown, install devtools & Clean up
 RUN chown -R node-red:root /usr/src/node-red && \
-    #/tmp/install_devtools.sh && \
+    /tmp/install_devtools.sh && \
     rm -r /tmp/*
 
 USER node-red
@@ -94,6 +94,10 @@ ENTRYPOINT ["npm", "start", "--cache", "/data/.npm", "--", "--userDir", "/data"]
 # of your added nodes modules for Node-RED
 #COPY package.json .
 #RUN npm install
+USER root
+RUN mkdir /rea-data
+RUN chown -R node-red:node-red /rea-data && chmod -R g+rwX /rea-data
+USER node-red
 
 RUN npm install node-red-dashboard
 RUN npm install node-red-contrib-web-worldmap
@@ -103,10 +107,8 @@ RUN npm install node-red-contrib-web-worldmap
 #       copy your settings and flows files to that volume instead.
 
 COPY settings.js /data/settings.js
-# COPY flows_cred.json /data/flows_cred.json
+COPY flows_cred.json /data/flows_cred.json
 COPY flows.json /data/flows.json
-# COPY device mapping file
-COPY device_mapping.json /data/device_mapping.json
 
 
 # User configuration directory volume

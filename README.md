@@ -2,40 +2,26 @@
 
 ## Installation and Deployment
 
-### Folder structure
-```
-/doc      : document
-/meshup   : node-red component to mesh up all datasoruces the flows will be stored in this directory
-/influx   : configuraiton of influx 
-/chronograf : data and config of chronograf
-```
+### Build the image
 
-For more information about the full TICK stack under docker (only partially used here) see: https://github.com/influxdata/sandbox
+Run this command to create the image:
+''' docker build -t fnyffene/swa-meshup . '''
 
-### Build for development
+Optional: 
+If you want to test the macro model simulation, also checkout and build swa-marcomodel.
+The docker compose file expects swa-meshup and swa-macromodel to be in the same parent folder.
 
-Run 
-` docker-compose up `
-to build all relevant containers
-
-
-### Startup development environment
+### Development Setup
 
 1. Get the .env file from the project owner and add it to root directory
 2. To start the devleopment enviornment, run: 
-` docker-compose up `
+''' docker-compose up '''
 
-After succcessful start, the components can be reached on the follwing urls:
-```
-localhost:1880/admin     NodeRed Admin
-loaclhost:5000           Rest API for the macromodel
-localhost:8086           InfluxDB
-localhost:8888           Chronograf frontend for InfluxDB
-```
+All changes to the flow will be mapped to this directory, just commit, push and pull the changes to/from git.
 
 ### Deployment
 
-All pushes to the "release" branch will be deployed to appui automatically (test environment).
+All pushes to the master branch will be deployed to appui automatically (test environment).
 
 
 ## Testing
